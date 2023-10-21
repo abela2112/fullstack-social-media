@@ -1,5 +1,5 @@
 import { useTheme } from '@emotion/react'
-import { ChatBubbleOutline, ChatBubbleOutlineOutlined, FavoriteBorderOutlined, FavoriteOutlined, Send, ShareOutlined } from '@mui/icons-material'
+import { ChatBubbleOutlineOutlined, FavoriteBorderOutlined, FavoriteOutlined, Send, ShareOutlined } from '@mui/icons-material'
 import { Divider, IconButton, Typography, Box, InputBase } from '@mui/material'
 import axios from 'axios'
 import Friend from 'components/Friend'

@@ -10,8 +10,6 @@ const FriendsList = ({ userId }) => {
     const dispatch = useDispatch()
     const { palette } = useTheme()
     const friends = useSelector((state) => state.user.friends)
-    const main = palette.neutral.main
-    const medium = palette.neutral.medium
     const dark = palette.neutral.dark
     const getFriends = async () => {
         const { data } = await axios.get(`users/${userId}/friends`)

@@ -1,5 +1,5 @@
 import { useTheme } from '@emotion/react'
-import { EditOutlined, LocationCityOutlined, ManageAccounts, ManageAccountsOutlined, WorkOffOutlined, WorkOutlineOutlined } from '@mui/icons-material'
+import { EditOutlined, LocationCityOutlined, ManageAccountsOutlined, WorkOutlineOutlined } from '@mui/icons-material'
 import { Box, Divider, Typography } from '@mui/material'
 import axios from 'axios'
 import FlexBetween from 'components/flexBetween'

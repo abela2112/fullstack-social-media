@@ -8,10 +8,9 @@ import WidgetWrapper from 'components/widgetWrapper'
 import FlexBetween from 'components/flexBetween'
 import UserImage from 'components/userImage'
 import Dropzone from 'react-dropzone'
-import { AttachFileOutlined, AudioFile, DeleteOutline, Edit, GifBox, ImageOutlined, MicOutlined, MoreHorizOutlined } from '@mui/icons-material'
+import { AttachFileOutlined, DeleteOutline, Edit, GifBox, ImageOutlined, MicOutlined, MoreHorizOutlined } from '@mui/icons-material'
 const MyPostWidget = ({ picturePath }) => {
     const { _id } = useSelector((state) => state.user)
-    const token = useSelector((state) => state.token)
     const { palette } = useTheme()
     const [post, setPost] = useState('')
     const [isImage, setIsImage] = useState(false)

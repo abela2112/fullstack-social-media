@@ -1,4 +1,4 @@
-import { Box, Typography } from "@mui/material"
+import { Box } from "@mui/material"
 
 const UserImage = ({ image, size = "60px" }) => {
     return (<Box width={size} height={size}>
@@ -8,7 +8,7 @@ const UserImage = ({ image, size = "60px" }) => {
             height={size}
             width={size}
             alt="user"
-            src={`http://localhost:4000/assets/${image}`}
+            src={`${process.env.REACT_APP_BASE_URL}assets/${image}`}
 
         />
 

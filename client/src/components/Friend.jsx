@@ -1,6 +1,4 @@
 import { useTheme } from '@emotion/react'
-import PersonAddAlt1OutlinedIcon from '@mui/icons-material/PersonAddAlt1Outlined';
-import PersonRemoveOutlinedIcon from '@mui/icons-material/PersonRemoveOutlined';
 import axios from 'axios'
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
@@ -12,7 +10,6 @@ import { Box, IconButton, Typography } from '@mui/material'
 import { PersonAddOutlined, PersonRemoveOutlined } from '@mui/icons-material'
 
 const Friend = ({ friendId, name, subtitle, userPicturePath }) => {
-    const token = useSelector((state) => state.token)
     const friends = useSelector((state) => state.user.friends)
     const dispatch = useDispatch()
     const navigate = useNavigate()
@@ -22,14 +19,14 @@ const Friend = ({ friendId, name, subtitle, userPicturePath }) => {
     const isFriend = friends?.find((friend) => friend._id === friendId);
 
     const primaryLight = palette.primary.light;
-    const primaryDark = palette.primary.dark
+
     const main = palette.primary.main
     const medium = palette.primary.medium
 
 
     const patchFriend = async () => {
         try {
-            const { data } = await axios.patch(`http://localhost:4000/users/${_id}/${friendId}`, {
+            const { data } = await axios.patch(`users/${_id}/${friendId}`, {
 
             })
             dispatch(setFriends({ friends: data }))

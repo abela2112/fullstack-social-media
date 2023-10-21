@@ -1,6 +1,6 @@
 import { useTheme } from "@emotion/react"
-import { Close, DarkMode, Height, Help, LightMode, MenuOpen, Message, Mode, Notifications, Search } from "@mui/icons-material"
-import { Box, FormControl, Icon, IconButton, InputBase, Menu, MenuItem, Select, Typography, useMediaQuery } from "@mui/material"
+import { Close, DarkMode, Help, LightMode, Message, Notifications, Search } from "@mui/icons-material"
+import { Box, FormControl, IconButton, InputBase, MenuItem, Select, Typography, useMediaQuery } from "@mui/material"
 import FlexBetween from "components/flexBetween"
 import { useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
@@ -17,7 +17,6 @@ const Navbar = () => {
     const nonMobileScreens = useMediaQuery('(min-width: 1000px)')
     const theme = useTheme()
     const neutralLight = theme.palette.neutral.light;
-    const dark = theme.palette.neutral.dark;
     const background = theme.palette.background.default;
     const primaryLight = theme.palette.primary.light;
     const alt = theme.palette.background.alt;
