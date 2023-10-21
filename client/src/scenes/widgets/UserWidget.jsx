@@ -20,13 +20,15 @@ const UserWidget = ({ picture, userId }) => {
     const main = palette.neutral.main;
     const getUser = async () => {
         try {
-            const { data } = await axios.get(`users/${userId}`, {
+            axios.get(`users/${userId}`, {
                 headers: {
                     Authorization: `Bearer ${token}`, // Include the token in the 'Authorization' header
                     'Content-Type': 'application/json' // Adjust the content type according to your API requirements
                 }
+            }).then(({ data }) => {
+                setuser(data);
             });
-            setuser(data);
+
 
         } catch (error) {
             console.error(error);
@@ -35,7 +37,7 @@ const UserWidget = ({ picture, userId }) => {
     }
     useEffect(() => {
         getUser();
-    }, [])
+    }, [getUser])
     if (!user) {
         return null;
     }

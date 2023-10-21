@@ -10,14 +10,16 @@ const PostsWidget = ({ userId, isProfile = false }) => {
     const dispatch = useDispatch()
 
     console.log(isProfile)
-    const getUserPosts = async () => {
-        const { data } = await axios.get(`post/user/${userId}`)
-        console.log(data)
-        dispatch(setPosts({ posts: data }))
+    const getUserPosts = () => {
+        axios.get(`post/user/${userId}`).then(({ data }) => {
+            console.log(data)
+            dispatch(setPosts({ posts: data }))
+        })
+
     }
-    const getPosts = async () => {
-        const { data } = await axios.get(`post`)
-        dispatch(setPosts({ posts: data }))
+    const getPosts = () => {
+        axios.get(`post`).then(({ data }) => { dispatch(setPosts({ posts: data })) })
+
     }
     useEffect(() => {
         if (isProfile) {
