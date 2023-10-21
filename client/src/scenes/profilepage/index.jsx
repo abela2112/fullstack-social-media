@@ -1,5 +1,6 @@
 import { Box, useMediaQuery } from "@mui/material"
 import axios from "axios"
+import { useEffect, useState } from "react"
 import { useParams } from "react-router-dom"
 import Navbar from "scenes/Navbar"
 import FriendsList from "scenes/widgets/FriendsList"
