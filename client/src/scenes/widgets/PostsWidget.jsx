@@ -17,11 +17,13 @@ const PostsWidget = ({ userId, isProfile = false }) => {
         })
 
     }
-
-    useEffect(() => {
+    const getPosts = () => {
         axios.get(`post`).then(({ data }) => { dispatch(setPosts({ posts: data })) })
 
-    }, []) // 
+    }
+    useEffect(() => {
+        getPosts()
+    }, [])
     return (
         <>{posts?.length > 0 && posts.map(({
             _id,
