@@ -11,7 +11,7 @@ import { useTheme } from "@emotion/react";
 import FlexBetween from "components/flexBetween";
 import { Edit } from "@mui/icons-material";
 import { setLogin } from "state";
-
+import toast, { Toaster } from 'react-hot-toast';
 const registerSchema = yup.object({
     firstName: yup.string().required('required'),
     lastName: yup.string().required('required'),
@@ -42,6 +42,7 @@ const intialValueLogin = {
 
 const Form = () => {
     const [pageType, setPageType] = useState('login');
+    const [isLoading, setIsLoading] = useState(false);
     const dispatch = useDispatch()
     const navigate = useNavigate()
     const { palette } = useTheme()
@@ -49,6 +50,7 @@ const Form = () => {
     const isRegister = pageType === 'register'
     const isNonMobile = useMediaQuery('(min-width:600px)')
     const register = async (values, onSubmitProps) => {
+        setIsLoading(true)
         try {
             const data = new FormData()
             for (let value in values) {
@@ -58,27 +60,31 @@ const Form = () => {
             const registerResponse = await axios.post('auth/register', data, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             })
+            setIsLoading(false)
             const isRegistered = await registerResponse.data
             onSubmitProps.resetForm()
             if (isRegistered) {
                 setPageType('login')
             }
         } catch (error) {
+            toast.error(error.response.data.error)
             console.error(error)
+            setIsLoading(false)
         }
     }
 
     const login = async (values, onSubmitProps) => {
+        setIsLoading(true)
         try {
             const loginResponse = await axios.post('auth/login', {
                 email: values.email,
                 password: values.password
 
             })
-
+            setIsLoading(false)
             const isLoggedIn = await loginResponse.data
             onSubmitProps.resetForm()
-            console.log(loginResponse.data);
+
             if (isLoggedIn) {
                 dispatch(setLogin({
                     user: isLoggedIn.user,
@@ -88,8 +94,11 @@ const Form = () => {
                 navigate('/home')
 
             }
+
         } catch (error) {
             console.error(error)
+            toast.error(error.response.data.error)
+            setIsLoading(false)
         }
 
     }
@@ -99,6 +108,7 @@ const Form = () => {
 
     };
     return (
+        <>
         <Formik onSubmit={handleFormSubmit}
             initialValues={isLogin ? intialValueLogin : intialValueRegister}
             validationSchema={isLogin ? loginSchema : registerSchema}>
@@ -194,14 +204,14 @@ const Form = () => {
                             helperText={touched.password && errors.password}
                             sx={{ gridColumn: 'span 4' }} />
                         {/* button */}
-                        <Box width={'500px'}>
-                            <Button fullWidth type="submit" variant="contained"
+                            <Box width={isNonMobile ? '440px' : "100%"}>
+                                <Button disabled={isLoading} fullWidth type="submit" variant="contained"
                                 sx={{
                                     m: '2rem 0', p: '1rem',
                                     backgroundColor: palette.primary.main,
                                     color: palette.background.alt
                                 }}
-                            >{isLogin ? 'Log in' : 'Register'}</Button>
+                                >{isLoading ? ('Loading...') : (isLogin ? 'Log in' : 'Register')}</Button>
                             <Typography
                                 onClick={() => {
                                     setPageType(isLogin ? 'register' : 'login')
@@ -220,8 +230,13 @@ const Form = () => {
 
 
                     </Box>
+
                 </form>)}
         </Formik>
+            <Toaster containerStyle={{
+                position: 'relative',
+            }} />
+        </>
     )
 }
 
