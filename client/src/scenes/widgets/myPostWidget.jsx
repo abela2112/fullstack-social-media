@@ -12,6 +12,7 @@ import { AttachFileOutlined, DeleteOutline, Edit, GifBox, ImageOutlined, MicOutl
 const MyPostWidget = ({ picturePath }) => {
     const { _id } = useSelector((state) => state.user)
     const { palette } = useTheme()
+    const [isLoading, setIsLoading] = useState(false)
     const [post, setPost] = useState('')
     const [isImage, setIsImage] = useState(false)
     const [image, setImage] = useState(null)
@@ -29,13 +30,16 @@ const MyPostWidget = ({ picturePath }) => {
             formData.append('picturePath', image.name)
         }
         try {
+            setIsLoading(true)
             const { data } = await axios.post('post/create', formData, { headers: { 'Content-Type': 'multipart/form-data' } })
             dispatch(setPosts({ posts: data }))
             setPost('')
             setImage(null)
+            setIsLoading(false)
 
         } catch (error) {
             console.log(error)
+            setIsLoading(false)
         }
     }
     return (
@@ -135,14 +139,16 @@ const MyPostWidget = ({ picturePath }) => {
 
                 </FlexBetween>}
                 <Button
-                    disabled={!post}
+                    disabled={!post || isLoading}
+                    variant='contained'
                     onClick={handlePost}
                     sx={{
+
                         color: palette.background.alt,
                         backgroundColor: palette.primary.main,
                         borderRadius: '3rem'
                     }}
-                >Post</Button>
+                >{isLoading ? "Loading" : "Post"}</Button>
             </FlexBetween>
         </WidgetWrapper>
     )
