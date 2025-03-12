@@ -20,6 +20,8 @@ const userSchema = new Schema(
     occupation: String,
     viewedProfile: Number,
     impressions: Number,
+    twitterLink: String,
+    linkedInLink: String,
   },
   { timestamps: true }
 );

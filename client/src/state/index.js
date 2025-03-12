@@ -1,15 +1,19 @@
 import { createSlice } from "@reduxjs/toolkit";
-
-const intialState = {
+import { getSocket, disconnectSocket } from "../socketio"; // Your socket logic
+let socketClient = null;
+const initialState = {
   mode: "light",
   user: null,
   posts: [],
+  onlineUsers: null,
+  userPosts: [],
   token: null,
+  // socketClient: null, // Ensure this matches with the reducer's state reference
 };
 
 export const authSlice = createSlice({
   name: "auth",
-  intialState,
+  initialState,
   reducers: {
     setMode: (state) => {
       state.mode = state.mode === "light" ? "dark" : "light";
@@ -17,20 +21,37 @@ export const authSlice = createSlice({
     setLogin: (state, action) => {
       state.user = action.payload.user;
       state.token = action.payload.token;
+
+      // Connect the socket after user logs in
+      if (!socketClient) {
+        socketClient = getSocket({ userId: state.user._id });
+        socketClient.connect();
+      }
     },
     setLogout: (state) => {
       state.user = null;
       state.token = null;
+      // Disconnect the socket when the user logs out
+      if (socketClient) {
+        disconnectSocket();
+        socketClient = null;
+      }
     },
     setFriends: (state, action) => {
       if (state.user) {
         state.user.friends = action.payload.friends;
       } else {
-        console.error("user friends not available");
+        console.error("User friends not available");
       }
     },
     setPosts: (state, action) => {
       state.posts = action.payload.posts;
+    },
+    setUserPosts: (state, action) => {
+      state.userPosts = action.payload.posts;
+    },
+    updateUser: (state, action) => {
+      state.user = action.payload.user;
     },
     updatePost: (state, action) => {
       const updatePost = state.posts.map((post) => {
@@ -39,8 +60,12 @@ export const authSlice = createSlice({
       });
       state.posts = updatePost;
     },
+    setOnlineUsers: (state, action) => {
+      state.onlineUsers = action.payload;
+    },
   },
 });
+
 export const {
   setFriends,
   setLogin,
@@ -48,6 +73,9 @@ export const {
   setMode,
   setPosts,
   updatePost,
+  setOnlineUsers,
+  setUserPosts,
+  updateUser,
 } = authSlice.actions;
 
 export default authSlice.reducer;

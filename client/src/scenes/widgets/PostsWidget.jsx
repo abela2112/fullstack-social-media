@@ -1,19 +1,19 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import axios from 'axios'
-import { setPosts } from 'state'
+import { setPosts, setUserPosts } from 'state'
 import PostWidget from './PostWidget'
 
 
 const PostsWidget = ({ userId, isProfile = false }) => {
-    const posts = useSelector((state) => state.posts)
+    const posts = useSelector((state) => isProfile ? state.auth.userPosts : state.auth.posts) 
     const dispatch = useDispatch()
-
+    const [isLoading, setIsoading] = useState(false)
     console.log(isProfile)
     const getUserPosts = () => {
         axios.get(`post/user/${userId}`).then(({ data }) => {
             console.log(data)
-            dispatch(setPosts({ posts: data }))
+            dispatch(setUserPosts({ posts: data }))
         })
 
     }
@@ -22,10 +22,17 @@ const PostsWidget = ({ userId, isProfile = false }) => {
 
     }
     useEffect(() => {
-        getPosts()
-    }, [])
+        setIsoading(true)
+        isProfile ? getUserPosts() : getPosts()
+        setIsoading(false)
+
+    }, [isProfile])
     return (
-        <>{posts?.length > 0 && posts.map(({
+
+        <>
+            {isLoading && <p>Loading...</p>}
+
+            {posts?.length > 0 ? posts.map(({
             _id,
             firstName,
             lastName,
@@ -49,7 +56,7 @@ const PostsWidget = ({ userId, isProfile = false }) => {
                 userPicturePath={userPicturePath}
                 description={description} />
 
-        ))}</>
+            )) : <p>No posts</p>}</>
     )
 }
 

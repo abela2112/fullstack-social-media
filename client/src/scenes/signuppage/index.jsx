@@ -1,8 +1,8 @@
 import { useTheme } from "@emotion/react";
 import { Box, Typography, useMediaQuery } from "@mui/material"
-import Form from "./Form";
+import Form from "./form";
 
-const LoginPage = () => {
+const RegisterPage = () => {
     const theme = useTheme()
     const primaryLight = theme.palette.primary.light;
     const alt = theme.palette.background.alt;
@@ -29,7 +29,7 @@ const LoginPage = () => {
                     }
                 >SocioMedia</Typography>
             </Box>
-            <Box width={isNonMobileScreen ? '50%' : '80%'}
+            <Box width={isNonMobileScreen ? '50%' : '93%'}
                 p={'2rem'}
                 m={'2rem auto'}
                 borderRadius={'1.5rem'}
@@ -38,15 +38,15 @@ const LoginPage = () => {
                     variant="h3"
                     sx={{ mb: '1rem', textAlign: 'center' }}
 
-                >welcome Back</Typography>
+                >welcome to SocioMedia</Typography>
                 <Typography
                     variant="body1"
                     sx={{ mb: '1rem', textAlign: 'center' }}
-                >Login to continue to SocioMedia</Typography>
+                >Create an account here</Typography>
 
                 <Form />
             </Box>
         </Box>
     )
 }
-export default LoginPage
+export default RegisterPage

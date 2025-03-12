@@ -10,12 +10,12 @@ import { Box, IconButton, Typography } from '@mui/material'
 import { PersonAddOutlined, PersonRemoveOutlined } from '@mui/icons-material'
 
 const Friend = ({ friendId, name, subtitle, userPicturePath }) => {
-    const friends = useSelector((state) => state.user.friends)
+    const friends = useSelector((state) => state.auth.user.friends)
     const dispatch = useDispatch()
     const navigate = useNavigate()
     const { palette } = useTheme()
 
-    const { _id } = useSelector((state) => state.user)
+    const { _id } = useSelector((state) => state.auth.user)
     const isFriend = friends?.find((friend) => friend._id === friendId);
 
     const primaryLight = palette.primary.light;
@@ -27,11 +27,8 @@ const Friend = ({ friendId, name, subtitle, userPicturePath }) => {
     const patchFriend = async () => {
         try {
             const { data } = await axios.patch(`users/${_id}/${friendId}`, {
-
             })
             dispatch(setFriends({ friends: data }))
-
-
         } catch (error) {
             console.log(error)
         }
@@ -53,9 +50,9 @@ const Friend = ({ friendId, name, subtitle, userPicturePath }) => {
                     <Typography fontSize={'0.75rem'} color={medium}>{subtitle}</Typography>
                 </Box>
             </FlexBetween>
-            <IconButton onClick={() => patchFriend()
-
-            } sx={{ p: "0.6rem", backgroundColor: primaryLight }}>{isFriend ? <PersonRemoveOutlined /> : <PersonAddOutlined />}</IconButton>
+            {friendId !== _id && (
+                <IconButton onClick={() => patchFriend()} sx={{ p: "0.6rem", backgroundColor: primaryLight }}>
+                    {isFriend ? <PersonRemoveOutlined /> : <PersonAddOutlined />}</IconButton>)}
         </FlexBetween>
     )
 }

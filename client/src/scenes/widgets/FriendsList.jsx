@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { setFriends } from 'state'
 import WidgetWrapper from '../../components/widgetWrapper'
@@ -8,11 +8,15 @@ import Friend from '../../components/Friend'
 import axios from 'axios'
 const FriendsList = ({ userId }) => {
     const dispatch = useDispatch()
+    const [isLoading, setIsLoading] = useState(false)
     const { palette } = useTheme()
-    const friends = useSelector((state) => state.user.friends)
+    const friends = useSelector((state) => state.auth.user.friends)
     const dark = palette.neutral.dark
+    const medium = palette.neutral.medium
     const getFriends = async () => {
+        setIsLoading(true)
         const { data } = await axios.get(`users/${userId}/friends`)
+        setIsLoading(false)
         dispatch(setFriends({ friends: data }))
     }
     useEffect(() => {
@@ -24,7 +28,8 @@ const FriendsList = ({ userId }) => {
                 sx={{ mb: '1.5rem' }}
             >Friend list</Typography>
             <Box mt={'1rem'} display={'flex'} flexDirection={'column'} gap={'2rem'}>
-                {friends.length > 0 && friends.map((friend) => (
+                {isLoading && <p>Loading...</p>}
+                {friends.length > 0 ? friends.map((friend) => (
                     <Friend
                         friendId={friend._id}
                         name={`${friend.firstName} ${friend.lastName}`}
@@ -32,7 +37,14 @@ const FriendsList = ({ userId }) => {
                         userPicturePath={friend.picture}
 
                     />
-                ))}
+                )) : (
+                    <Typography
+                        color={medium}
+                        variant='h5'
+                        fontWeight={'500'}
+                        sx={{ mb: '1.5rem' }}
+                    >No friends</Typography>
+                )}
             </Box>
         </WidgetWrapper>
     )

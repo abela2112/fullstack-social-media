@@ -8,7 +8,7 @@ const UserImage = ({ image, size = "60px" }) => {
             height={size}
             width={size}
             alt="user"
-            src={`${process.env.REACT_APP_BASE_URL}assets/${image}`}
+            src={image || "/assets/avatar.png"}
 
         />
 

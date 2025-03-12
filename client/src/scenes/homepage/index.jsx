@@ -1,17 +1,37 @@
 import { Box, useMediaQuery } from "@mui/material";
-import { useSelector } from "react-redux"
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux"
 import Navbar from "scenes/Navbar"
 import FriendsList from "scenes/widgets/FriendsList";
 import PostsWidget from "scenes/widgets/PostsWidget";
 import UserWidget from "scenes/widgets/UserWidget";
 import AdvertiseWidget from "scenes/widgets/advertiseWidget";
 import MyPostWidget from "scenes/widgets/myPostWidget";
+import { getSocket } from "socketio";
+import { setOnlineUsers } from "state";
 
 const HomePage = () => {
-    const { _id, picture } = useSelector((state) => state.user);
+    const { _id, picture } = useSelector((state) => state?.auth?.user);
+    const userId = _id;
+    const dispatch = useDispatch();
+    useEffect(() => {
+        if (!userId) return;
+        const socket = getSocket(userId);
+        socket.connect();
+        // ✅ Listen for online users
+        socket.on("getOnlineUsers", (onlineUsers) => {
+            console.log("Online users:", onlineUsers);
+            dispatch(setOnlineUsers(onlineUsers)); // Update Redux state
+        });
+
+        return () => {
+            socket.off("getOnlineUsers");
+        };
+    }, [userId]);
     const isNonMobileScreen = useMediaQuery('(min-width:1000px)');
     return (
-        <Box><Navbar />
+        <Box>
+            <Navbar />
             <Box width={'100%'}
                 padding={'2rem 6%'}
                 gap={'1rem'}

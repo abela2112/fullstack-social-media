@@ -2,15 +2,8 @@ import User from "../model/user.js";
 
 export const register = async (req, res) => {
   try {
-    const {
-      firstName,
-      lastName,
-      email,
-      password,
-      location,
-      occupation,
-      picture,
-    } = req.body;
+    const { firstName, lastName, email, password, occupation } = req.body;
+    console.log(req.body);
     if (!firstName || !lastName || !email)
       throw new Error("please provide a firstname");
     const user = await User.create({
@@ -18,11 +11,12 @@ export const register = async (req, res) => {
       lastName,
       email,
       password,
-      location,
+
       occupation,
-      picture: picture,
     });
-    res.status(200).json(user);
+    const userWithoutPassword = user.toObject();
+    delete userWithoutPassword.password;
+    res.status(200).json(userWithoutPassword);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -37,10 +31,14 @@ export const login = async (req, res) => {
 
     if (!isMatch) throw new Error(`invalid credentials`);
     const token = user.createToken();
+    const userWithoutPassword = user.toObject();
+    delete userWithoutPassword.password;
 
-    res.status(200).json({ token, user });
+    res.status(200).json({ token, user: userWithoutPassword });
   } catch (err) {
     console.log(err);
     res.status(500).json({ error: err.message });
   }
 };
+
+

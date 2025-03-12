@@ -10,7 +10,7 @@ import UserImage from 'components/userImage'
 import Dropzone from 'react-dropzone'
 import { AttachFileOutlined, DeleteOutline, Edit, GifBox, ImageOutlined, MicOutlined, MoreHorizOutlined } from '@mui/icons-material'
 const MyPostWidget = ({ picturePath }) => {
-    const { _id } = useSelector((state) => state.user)
+    const { _id } = useSelector((state) => state.auth.user)
     const { palette } = useTheme()
     const [isLoading, setIsLoading] = useState(false)
     const [post, setPost] = useState('')
@@ -20,18 +20,27 @@ const MyPostWidget = ({ picturePath }) => {
     const dispatch = useDispatch()
     const medium = palette.neutral.medium
     const mediumMain = palette.neutral.mediumMain
-    const handlePost = async () => {
 
-        const formData = new FormData()
-        formData.append('userId', _id)
-        formData.append('description', post)
-        if (image) {
-            formData.append('picture', image)
-            formData.append('picturePath', image.name)
-        }
+    const handlePost = async () => {
         try {
+            if (!_id || !post) {
+                console.log("User ID or post content is missing.");
+                return;
+            }
+            const formData = new FormData()
+            formData.append('userId', _id)
+            formData.append('description', post)
+            if (image) {
+                formData.append('picture', image)
+                // formData.append('picturePath', image.name)
+            }
+            // Debugging: Check the contents of FormData
+            for (const pair of formData.entries()) {
+                console.log(`${pair[0]}: ${pair[1]}`);
+            }
             setIsLoading(true)
             const { data } = await axios.post('post/create', formData, { headers: { 'Content-Type': 'multipart/form-data' } })
+            console.log("data")
             dispatch(setPosts({ posts: data }))
             setPost('')
             setImage(null)
@@ -40,6 +49,7 @@ const MyPostWidget = ({ picturePath }) => {
         } catch (error) {
             console.log(error)
             setIsLoading(false)
+
         }
     }
     return (

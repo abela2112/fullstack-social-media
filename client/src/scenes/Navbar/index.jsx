@@ -9,11 +9,14 @@ import { setMode, setLogout } from "state"
 
 import MenuIcon from '@mui/icons-material/Menu';
 
+import { socket } from "socketio"
+
 const Navbar = () => {
     const [isMobileToggle, setIsMobileToggle] = useState(false)
     const Navigate = useNavigate()
     const dispatch = useDispatch()
-    const user = useSelector((state) => state.user)
+    const user = useSelector((state) => state.auth.user)
+    const socketClient = useSelector((state) => state.auth.socketClient)
     const nonMobileScreens = useMediaQuery('(min-width: 1000px)')
     const theme = useTheme()
     const neutralLight = theme.palette.neutral.light;
@@ -51,7 +54,9 @@ const Navbar = () => {
                 <IconButton onClick={() => dispatch(setMode())}>
                     {theme.palette.mode === "dark" ? (<DarkMode sx={{ fontSize: "25px" }} />) : (<LightMode sx={{ fontSize: "25px" }} />)}
                 </IconButton>
-                <Message sx={{ fontSize: "25px" }} />
+                <IconButton onClick={() => Navigate('/chat')}>
+                    <Message sx={{ fontSize: "25px" }} />
+                </IconButton>
                 <Notifications sx={{ fontSize: "25px" }} />
                 <Help sx={{ fontSize: "25px" }} />
                 <FormControl variant="standard" value={fullname}>
@@ -103,7 +108,8 @@ const Navbar = () => {
                         <IconButton onClick={() => dispatch(setMode())}>
                             {theme.palette.mode === "dark" ? (<DarkMode sx={{ fontSize: "25px" }} />) : (<LightMode sx={{ fontSize: "25px" }} />)}
                         </IconButton>
-                        <Message sx={{ fontSize: "25px" }} />
+                        <IconButton onClick={() => Navigate('/chat')}>
+                            <Message sx={{ fontSize: "25px" }} /></IconButton>
                         <Notifications sx={{ fontSize: "25px" }} />
                         <Help sx={{ fontSize: "25px" }} />
                         <FormControl variant="standard" value={fullname}>
@@ -124,7 +130,17 @@ const Navbar = () => {
                                 input={<InputBase />}>
                                 <MenuItem value={fullname}>
                                     <Typography>{fullname}</Typography></MenuItem>
-                                <MenuItem onClick={() => dispatch(setLogout())}>Logout</MenuItem>
+                                <MenuItem onClick={() => {
+                                    // const socket = io('http://localhost:4000')
+                                    window.localStorage.removeItem('userId')
+                                    // if (socketClient?.connected) {
+                                    //     socket.disconnect()
+                                    //     console.log("socket connected", socketClient?.connected)
+
+
+                                    // }
+                                    dispatch(setLogout())
+                                }}>Logout</MenuItem>
                             </Select>
                         </FormControl>
                     </FlexBetween>

@@ -5,8 +5,10 @@ import App from "./App";
 
 import { BrowserRouter } from "../node_modules/react-router-dom/dist/index";
 import authReducer from "state";
-import { configureStore } from "@reduxjs/toolkit";
+import messageReducer from "state/messages";
+import { configureStore, combineReducers } from "@reduxjs/toolkit";
 import { Provider } from "react-redux";
+
 import {
   persistReducer,
   persistStore,
@@ -20,7 +22,15 @@ import {
 import storage from "redux-persist/lib/storage";
 import { PersistGate } from "redux-persist/integration/react";
 const persistConfig = { key: "root", storage, version: 1 };
-const persistedReducer = persistReducer(persistConfig, authReducer);
+// Combine reducers
+const rootReducer = combineReducers({
+  message: messageReducer,
+  auth: authReducer,
+});
+// Persist the combined reducer
+const persistedReducer = persistReducer(persistConfig, rootReducer);
+
+// const persistedReducer = persistReducer(persistConfig, authReducer);
 const store = configureStore({
   reducer: persistedReducer,
   middleware: (getDefaultMiddleware) =>

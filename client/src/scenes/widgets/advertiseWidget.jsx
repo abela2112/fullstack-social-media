@@ -20,7 +20,7 @@ const AdvertiseWidget = () => {
                 height='auto'
                 alt='advert'
                 style={{ borderRadius: '0.75rem', margin: '0.75rem 0' }}
-                src={`${process.env.REACT_APP_BASE_URL}assets/library.png`}
+                src={'/assets/library.png'}
 
             />
             <FlexBetween>
