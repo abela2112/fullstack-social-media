@@ -22,9 +22,13 @@ export const authSlice = createSlice({
       state.user = action.payload.user;
       state.token = action.payload.token;
 
+
       // Connect the socket after user logs in
       if (!socketClient) {
-        socketClient = getSocket({ userId: state.user._id });
+        console.log("Connecting ..socket user id", state.user._id);
+        socketClient = getSocket({
+          userId: window.localStorage.getItem("userId"),
+        });
         socketClient.connect();
       }
     },

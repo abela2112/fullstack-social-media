@@ -31,8 +31,9 @@ const FriendsList = ({ userId }) => {
                 {isLoading && <p>Loading...</p>}
                 {friends.length > 0 ? friends.map((friend) => (
                     <Friend
-                        friendId={friend._id}
-                        name={`${friend.firstName} ${friend.lastName}`}
+                        userId={userId}
+                        friendId={friend?._id}
+                        name={`${friend?.firstName} ${friend?.lastName}`}
                         subtitle={friend.occupation}
                         userPicturePath={friend.picture}
 

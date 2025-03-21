@@ -24,6 +24,8 @@ import messagesRoutes from "./routes/messages.js";
 import verifyToken from "./middleware/verifyToken.js";
 import { editProfile } from "./controllers/users.js";
 import { app, server } from "./lib/socket.js";
+import { sendMessage } from "./controllers/messages.js";
+import { uploader } from "./lib/helper.js";
 //middleware
 app.use(express.json());
 app.use(helmet());
@@ -53,6 +55,10 @@ app.patch(
   upload.single("picture"),
   editProfile
 );
+// upload.single("image"),
+//   sendMessage
+
+app.post("/uploads", upload.single("image"), uploader);
 app.use("/post", postRoutes);
 app.use("/auth", authRoutes);
 app.use("/users", usersRoutes);

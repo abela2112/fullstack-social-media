@@ -8,27 +8,33 @@ const io = new Server(server,{
         origin: ['http://localhost:3000']
     }
 })
-export const getRecieverSocketId=(userId)=>{
-    return userSocketMap[userId]
-}
+export const getRecieverSocketId = (userId) => {
+  console.log("usersocket map", userSocketMap);
+  return userSocketMap[userId];
+};
 // user socket map used to store online users
-const userSocketMap={}
+const userSocketMap = {};
 
-io.on('connection', (socket) => {
-    console.log('a user connected', socket.id);
-    const userId=socket.handshake.query.userId
-   
-    if (userId){
-        userSocketMap[userId]=socket.id
-        console.log("userSocketMap",userSocketMap)
+io.on("connection", (socket) => {
+  console.log("a user connected", socket.id);
+  const userId = socket?.handshake?.query?.userId;
+  console.log("userId", userId);
+
+  if (userId === undefined) {
+    console.log("❌ Missing userId! Connection ignored.");
+    return;
+  } else {
+    console.log("✅ userId found:", userId);
+    userSocketMap[userId] = socket.id;
+  }
+  console.log("userSocketMap", userSocketMap);
+  io.emit("getOnlineUsers", Object.keys(userSocketMap));
+  socket.on("disconnect", () => {
+    console.log("a user disconnected", socket.id);
+    if (userId) {
+      delete userSocketMap[userId];
     }
-    io.emit('getOnlineUsers',Object.keys(userSocketMap))
-    socket.on('disconnect', () => {
-        console.log('a user disconnected', socket.id);
-        if(userId){
-            delete userSocketMap[userId]
-        }
-        io.emit('getOnlineUsers',Object.keys(userSocketMap));
-    });
-})
+    io.emit("getOnlineUsers", Object.keys(userSocketMap));
+  });
+});
 export {io, server, app}

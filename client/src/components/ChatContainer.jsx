@@ -1,6 +1,6 @@
 import { AppBar, Avatar, Box, CssBaseline, Divider, IconButton, InputBase, List, ListItem, ListItemAvatar, ListItemText, Menu, Paper, Skeleton, Toolbar, Typography } from '@mui/material'
 import React, { useEffect, useRef, useState } from 'react'
-
+import ScrollableFeed from 'react-scrollable-feed'
 import { useDispatch, useSelector } from 'react-redux'
 import { setMessages } from 'state/messages'
 import axios from 'axios'
@@ -9,79 +9,67 @@ import { Call, MoreVert, Search, Send } from '@mui/icons-material'
 import { useTheme } from '@emotion/react'
 import MessageSkeletons from './skeletons/messageSkeletons'
 import { getSocket } from 'socketio'
-const BoxContainer = styled(Box)({
+import MessageInput from './MessageInput'
+import ChatHeader from './ChatHeader'
+const BoxContainer = styled(Box)(({ theme }) => ({
   flex: 1,
   display: "flex",
   flexDirection: "column",
-  height: "100%",
-  width: "100%",
-  backgroundColor: "#d9fdd3",
+  backgroundColor: theme.palette.background.default,
+  // backgroundColor: "#d9fdd3",
   justifyContent: "space-between",
-});
+  // backgroundImage: "url(https://www.transparenttextures.com/patterns/stardust.png)",
+
+}));
 
 
 
-const ChatHeader = styled(AppBar)({
-  position: "relative",
-  backgroundColor: "#fff",
-  color: "#000",
-  boxShadow: "none",
-  borderBottom: "1px solid #ddd",
-});
 
-const ChatMessages = styled(Box)({
+
+const ChatMessages = styled(Box)(({ theme }) => ({
   flex: 1,
   padding: "16px",
   overflowY: "auto",
-  backgroundColor: "#ebf0f4",
+  backgroundColor: theme.palette.background.default,
   flexDirection: "column",
   display: "flex",
+  // height: '100%',
   flexDirection:'column',
   justifyContent:'flex-end',
-  backgroundImage: "url(https://www.transparenttextures.com/patterns/stardust.png)",
-});
-
-const MessageBubble = styled(Paper)(({ sender }) => ({
-  padding: "10px",
-  borderRadius: "10px",
-  maxWidth: "60%",
-  marginBottom: "8px",
-  alignSelf: sender ? "flex-end" : "flex-start",
-  backgroundColor: sender ? "#dcf8c6" : "#fff",
+  // backgroundImage: "url(https://www.transparenttextures.com/patterns/stardust.png)",
 }));
 
-const MessageInputContainer = styled(Box)({
+const MessageBubble = styled(Paper)(({ sender, theme }) => ({
   padding: "10px",
-  backgroundColor: "#fff",
+  borderRadius: "10px",
+  maxWidth: "100%",
+  marginBottom: "8px",
+  // alignSelf: sender ? "flex-end" : "flex-start",
+  backgroundColor: sender ? theme.palette.primary.main : theme.palette.background.alt,
+}));
+
+const MessageContainer = styled(Box)(({ sender }) => ({
   display: "flex",
-  alignItems: "center",
-  borderTop: "1px solid #ddd",
-});
+  gap: "0.5rem",
+  alignItems: "start",
+  maxWidth: "60%",
+  alignSelf: sender ? "flex-end" : "flex-start",
+  flexDirection: sender ? "row-reverse" : "row",
+
+}));
+
 
 
 
 const ChatContainer = ({ user }) => {
   const [isMessageLoading, setIsMessageLoading] = useState(true)
   const { messages, users, selectedUser } = useSelector(state => state.message)
-  const [newMessage, setNewMessage] = useState("")
   const { palette } = useTheme()
+
   const userId=useSelector(state=>state.auth.user._id)
-  console.log("userId",userId)
-  console.log("messages",messages)
-  const primaryLight = palette.primary.light;
-  const main = palette.primary.main
+  console.log("messages-> ", messages)
   const dispatch = useDispatch()
-  const sendMessage=async()=>{
-    try {
-      const {data}=await axios.post(`messages/send/${selectedUser._id}`,{
-text:newMessage
-      })
-      console.log("data",data)
- 
-    } catch (error) {
-      console.log("error",error)
-    }
- }
+
   const messagesEndRef = useRef(null);
  const  subscribeToNewMessages = () => {
     // Check if the message is for the selected user
@@ -89,7 +77,7 @@ text:newMessage
     const  socket=getSocket(selectedUser._id);
       socket.on("newMessage", (message) => {
         console.log("newMessage",message)
-        dispatch(setMessages((messages) => [...messages, message]));
+        dispatch(setMessages((prevMessages) => [...prevMessages, message]));
       });
     }
     const unsubscribeMesage=()=>{
@@ -98,7 +86,7 @@ text:newMessage
       socket.off("newMessage")
     }
 useEffect(() => {
-  messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  if (messagesEndRef.current && messages.length > 0) { messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }); }
 }, [messages]);
   const getmessages = async (id) => {
     setIsMessageLoading(true)
@@ -122,43 +110,7 @@ useEffect(() => {
   return (
     <BoxContainer>
       {/* Chat Header */}
-      <ChatHeader>
-        <Toolbar>
-          <Avatar sx={{ mr: 2 }} alt={`${user?.firstName}`} src={user?.picture}></Avatar>
-          <Box sx={{ flexGrow: 1 }}>
-            <Typography variant="h6">{user?.firstName} {user?.lastName}</Typography>
-            <Typography variant="body2" color="textSecondary">
-              Last seen 5 mins ago
-            </Typography>
-          </Box>
-          <IconButton sx={{
-            '&:hover': {
-              backgroundColor: primaryLight
-            },
-
-
-          }}>
-            <Search />
-          </IconButton>
-          <IconButton sx={{
-            '&:hover': {
-              backgroundColor: primaryLight
-            },
-
-          }}
-          >
-            <Call />
-          </IconButton>
-          <IconButton sx={{
-            '&:hover': {
-              backgroundColor: primaryLight
-            }
-          }}>
-            <MoreVert />
-          </IconButton>
-        </Toolbar>
-
-      </ChatHeader>
+      <ChatHeader />
 
       {/* Chat Messages */}
 
@@ -166,37 +118,28 @@ useEffect(() => {
         isMessageLoading ?
         <MessageSkeletons/>
          :
+          <ScrollableFeed style={{
+            flex: 1,
+          }}>
           <ChatMessages>
-            {messages?.length>0 && messages?.map((msg, index) => (
-              <MessageBubble key={index} sender={msg.senderId===userId}>
-                {msg.text}
-              </MessageBubble>
+              {messages?.length > 0 && messages?.map((msg, index) => (
+                <MessageContainer key={index} sender={msg.senderId?._id === userId} ref={messagesEndRef}>
+                  <Avatar src={msg.senderId ? msg?.senderId?.picture : msg?.recieverId?.picture} sx={{ height: '30px', width: '30px' }} />
+                  <MessageBubble sender={msg.senderId?._id === userId}>
+                    {msg.image && <img src={msg.image} alt="" width={100} />}
+                    {msg.text}
+                  </MessageBubble>
+                </MessageContainer>
             ))}
-            <div ref={messagesEndRef} />
+
           </ChatMessages>
+          </ScrollableFeed>
       }
 
 
       {/* Message Input */}
-      <MessageInputContainer>
-        <InputBase
-          sx={{ ml: 1, flex: 1 }}
-          placeholder="Message"
-          value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
-        onKeyPress={(e) => e.key === "Enter" && sendMessage()}
-        />
-        <IconButton sx={{
-          '&:hover': {
-            backgroundColor: primaryLight
-          },
+      <MessageInput />
 
-          color: main
-        }}
-          onClick={sendMessage}>
-          <Send />
-        </IconButton>
-      </MessageInputContainer>
     </BoxContainer>
   )
 }

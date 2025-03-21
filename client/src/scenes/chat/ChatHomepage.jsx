@@ -19,7 +19,7 @@ const ChatPage = () => {
     return (
         <>
     <RootContainer>
-      <CssBaseline/>
+
 
       {/* Sidebar */}
       <Sidebar/>

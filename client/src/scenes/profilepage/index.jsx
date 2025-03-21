@@ -1,6 +1,7 @@
 import { Box, useMediaQuery } from "@mui/material"
 import axios from "axios"
 import { useEffect, useState } from "react"
+import { useSelector } from "react-redux"
 import { useParams } from "react-router-dom"
 import Navbar from "scenes/Navbar"
 import FriendsList from "scenes/widgets/FriendsList"
@@ -11,6 +12,8 @@ import MyPostWidget from "scenes/widgets/myPostWidget"
 const ProfilePage = () => {
     const isNonMobileScreen = useMediaQuery('(min-width:1000px)')
     const { userId } = useParams()
+    const LoggedInUser = useSelector(state => state.auth.user._id)
+
     const [user, setUser] = useState(null)
     const getUser = async () => {
         const { data } = await axios.get(`users/${userId}`);
@@ -41,7 +44,9 @@ const ProfilePage = () => {
                 </Box>
                 <Box flexBasis={isNonMobileScreen ? '42%' : undefined}
                     mt={isNonMobileScreen ? undefined : '2rem'}>
-                    <MyPostWidget picturePath={user.picture} />
+                    {
+                        LoggedInUser === userId && <MyPostWidget userId={user?._id} isProfile={true} />
+                    }
                     <PostsWidget userId={user?._id} isProfile={true} />
 
                 </Box>

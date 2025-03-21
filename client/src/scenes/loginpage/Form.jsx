@@ -40,6 +40,8 @@ const Form = () => {
             })
             setIsLoading(false)
             const isLoggedIn = await loginResponse.data
+            window.localStorage.setItem('userId', isLoggedIn.user._id)
+
             onSubmitProps.resetForm()
 
             if (isLoggedIn) {

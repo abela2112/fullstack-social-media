@@ -5,8 +5,10 @@ import { getUsersFriends } from '../controllers/users.js';
 const router = express.Router();
 
 router.get('/:id', verifyToken, getMessages);
-router.get('/:id/friends', verifyToken, getUsersFriends); // Moved down
+router.get("/:id/friends", verifyToken, getUsersFriends);
 
-router.post('/send/:id',verifyToken,sendMessage);
+// Moved down
+
+router.post("/send/:id", verifyToken, sendMessage);
 
 export default router;

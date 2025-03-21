@@ -131,14 +131,8 @@ const Navbar = () => {
                                 <MenuItem value={fullname}>
                                     <Typography>{fullname}</Typography></MenuItem>
                                 <MenuItem onClick={() => {
-                                    // const socket = io('http://localhost:4000')
+
                                     window.localStorage.removeItem('userId')
-                                    // if (socketClient?.connected) {
-                                    //     socket.disconnect()
-                                    //     console.log("socket connected", socketClient?.connected)
-
-
-                                    // }
                                     dispatch(setLogout())
                                 }}>Logout</MenuItem>
                             </Select>
