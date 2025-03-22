@@ -5,7 +5,7 @@ const SOCKET_URL = "http://localhost:4000"; // Replace with your server URL
 let socket = null;
 
 export const getSocket = ({userId}) => {
-  console.log("Connecting ..socket user id", userId);
+  // console.log("Connecting ..socket user id", userId);
   if (!socket) {
     socket = io(SOCKET_URL, {
       autoConnect: false,

@@ -2,11 +2,9 @@ import { AppBar, Avatar, Box, CssBaseline, Divider, IconButton, InputBase, List,
 import React, { useEffect, useRef, useState } from 'react'
 import ScrollableFeed from 'react-scrollable-feed'
 import { useDispatch, useSelector } from 'react-redux'
-import { setMessages } from 'state/messages'
+import { addMessage, setMessages } from 'state/messages'
 import axios from 'axios'
 import styled from '@emotion/styled'
-import { Call, MoreVert, Search, Send } from '@mui/icons-material'
-import { useTheme } from '@emotion/react'
 import MessageSkeletons from './skeletons/messageSkeletons'
 import { getSocket } from 'socketio'
 import MessageInput from './MessageInput'
@@ -59,32 +57,43 @@ const MessageContainer = styled(Box)(({ sender }) => ({
 }));
 
 
-
+let socket;
 
 const ChatContainer = ({ user }) => {
+  const userId = useSelector(state => state.auth.user._id)
   const [isMessageLoading, setIsMessageLoading] = useState(true)
   const { messages, users, selectedUser } = useSelector(state => state.message)
-  const { palette } = useTheme()
-
-  const userId=useSelector(state=>state.auth.user._id)
-  console.log("messages-> ", messages)
   const dispatch = useDispatch()
-
   const messagesEndRef = useRef(null);
- const  subscribeToNewMessages = () => {
-    // Check if the message is for the selected user
-    if(!selectedUser) return
-    const  socket=getSocket(selectedUser._id);
-      socket.on("newMessage", (message) => {
-        console.log("newMessage",message)
-        dispatch(setMessages((prevMessages) => [...prevMessages, message]));
-      });
-    }
-    const unsubscribeMesage=()=>{
-     
-      const  socket=getSocket(selectedUser._id);
-      socket.off("newMessage")
-    }
+  const [socketConnected, setSocketConnected] = useState(false)
+  const [typing, setTyping] = useState(false)
+  const [isTyping, setIsTyping] = useState(false)
+  useEffect(() => {
+    socket = getSocket(selectedUser._id);
+    socket.on("typing", () => setIsTyping(true))
+    socket.on("stop typing", () => setIsTyping(false))
+
+  })
+  useEffect(() => {
+
+    socket.emit("setup", userId)
+    socket.on("connected", () => {
+      setSocketConnected(true)
+      console.log("socketconnected", socketConnected)
+    })
+  })
+  useEffect(() => {
+    if (!selectedUser) return
+
+    getmessages(selectedUser._id)
+    socket.emit("join room", { senderId: userId, receiverId: selectedUser._id });
+    // return () => {
+    //   socket.emit("leave room", { senderId: userId, receiverId: selectedUser._id });
+    // };
+
+
+  }, [selectedUser, socket])
+
 useEffect(() => {
   if (messagesEndRef.current && messages.length > 0) { messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }); }
 }, [messages]);
@@ -99,18 +108,24 @@ useEffect(() => {
       setIsMessageLoading(false)
     }
   }
+
   useEffect(() => {
     if(!selectedUser) return
-    getmessages(selectedUser?._id)
-    subscribeToNewMessages()
-    return ()=> unsubscribeMesage()
+    socket.on("newMessage", (message) => {
+      console.log("newMessage", message)
+
+      dispatch(addMessage(message));
+      // setMessages([...Messages, message])
+      //getmessages(selectedUser._id)
+    });
+    return () => socket.off("newMessage")
   }, [selectedUser])
 
   
   return (
     <BoxContainer>
       {/* Chat Header */}
-      <ChatHeader />
+      <ChatHeader typing={isTyping} socketConnected={socketConnected} />
 
       {/* Chat Messages */}
 
@@ -138,129 +153,13 @@ useEffect(() => {
 
 
       {/* Message Input */}
-      <MessageInput />
+      <MessageInput typing={typing} setTyping={setTyping} socket={socket}
+        socketConnected={
+          socketConnected
+        } />
 
     </BoxContainer>
   )
 }
 
 export default ChatContainer
-
-
-// const ChatContainer = () => {
-//     const [isMessageLoading, setIsMessageLoading] = useState(false)
-//     const { messages, users,selectedUser } = useSelector(state => state.message)
-//     const [newMessage, setNewMessage] = useState("")
-
-//     const dispatch = useDispatch()
-//     const getmessages = async (id) => {
-//         setIsMessageLoading(true)
-//         try {
-//             const { data } = await axios(`/api/messages/${id}`)
-//             dispatch(setMessages(data))
-//             setIsMessageLoading(false)
-//         } catch (error) {
-//             console.error(error)
-//             setIsMessageLoading(false)
-//         }
-//     }
-//     useEffect(() => {
-//         getmessages(selectedUser?._id)
-//     }, [selectedUser?._id])
-
-//     if (isMessageLoading) {
-//         return <Box>Loading...</Box>
-//     }
-//     return (
-
-//           <RootContainer>
-//       <CssBaseline/>
-
-//       {/* Sidebar */}
-//       <Sidebar>
-//         <Box p={2} display="flex" alignItems="center">
-//           <IconButton>
-//             <Menu />
-//           </IconButton>
-//           <Typography variant="h6" sx={{ flexGrow: 1, textAlign: "center" }}>
-//             Chatgram
-//           </Typography>
-//           <IconButton>
-//             <MoreVert />
-//           </IconButton>
-//         </Box>
-
-//         <Box display="flex" alignItems="center" px={2} py={1}>
-//           <Search/>
-//           <InputBase sx={{ ml: 1, flex: 1 }} placeholder="Search..." />
-//         </Box>
-
-//         <Divider />
-
-//         <List>
-//           {users.map((contact, index) => (
-//             <ListItem button key={index}>
-//               <ListItemAvatar>
-//                 <Avatar>{contact.name[0]}</Avatar>
-//               </ListItemAvatar>
-//               <ListItemText primary={contact.name} secondary={contact.message} />
-//               <Typography variant="body2" color="textSecondary">
-//                 {contact.time}
-//               </Typography>
-//             </ListItem>
-//           ))}
-//         </List>
-//       </Sidebar>
-//       <BoxContainer>
-//         {/* Chat Header */}
-//         <ChatHeader>
-//           <Toolbar>
-//             <Avatar sx={{ mr: 2 }}>D</Avatar>
-//             <Box sx={{ flexGrow: 1 }}>
-//               <Typography variant="h6">David Moore</Typography>
-//               <Typography variant="body2" color="textSecondary">
-//                 Last seen 5 mins ago
-//               </Typography>
-//             </Box>
-//             <IconButton>
-//               <Search />
-//             </IconButton>
-//             <IconButton>
-//               <Call />
-//             </IconButton>
-//             <IconButton>
-//               <MoreVert/>
-//             </IconButton>
-//           </Toolbar>
-
-//         </ChatHeader>
-
-//         {/* Chat Messages */}
-//         <ChatMessages>
-//           {messages.map((msg, index) => (
-//             <MessageBubble key={index} sender={msg.sender}>
-//               {msg.text}
-//             </MessageBubble>
-//           ))}
-//         </ChatMessages>
-
-//         {/* Message Input */}
-//         <MessageInputContainer>
-//           <InputBase
-//             sx={{ ml: 1, flex: 1 }}
-//             placeholder="Message"
-//             value={newMessage}
-//             onChange={(e) => setNewMessage(e.target.value)}
-//             // onKeyPress={(e) => e.key === "Enter" && sendMessage()}
-//           />
-//           <IconButton >
-//             {/* onClick={sendMessage} */}
-//             <Send />
-//           </IconButton>
-//         </MessageInputContainer>
-//       </BoxContainer>
-//       </RootContainer>
-//     )
-// }
-
-// export default ChatContainer

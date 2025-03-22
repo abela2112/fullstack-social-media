@@ -3,7 +3,7 @@ import styled from '@emotion/styled';
 import { Image, Send, Cancel, EmojiEmotions } from '@mui/icons-material';
 import { Box, Button, Divider, Drawer, IconButton, InputBase } from '@mui/material';
 import axios from 'axios';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
 import EmojiPicker from 'emoji-picker-react';
@@ -17,7 +17,7 @@ const MessageInputContainer = styled(Box)(({ theme }) => ({
     borderTop: `1px solid ${theme.palette.background.alt}`,
 }));
 
-const MessageInput = () => {
+const MessageInput = ({ socket, socketConnected, setTyping, typing }) => {
     const [newMessage, setNewMessage] = useState("");
     const { messages, users, selectedUser } = useSelector(state => state.message);
     const [imagePreview, setImagePreview] = useState(null);
@@ -59,9 +59,9 @@ const MessageInput = () => {
     };
     const sendMessage = async (e) => {
         e.preventDefault();
-
         if (!newMessage.trim() && !imagePreview) return;
-
+        socket.emit('stop typing', selectedUser._id)
+        setTyping(false)
         try {
             const { data } = await axios.post(
                 `http://localhost:4000/messages/send/${selectedUser._id}`,
@@ -70,18 +70,33 @@ const MessageInput = () => {
                     image: imagePreview,
                 }
             );
-            dispatch(setMessages(data));
+
             setNewMessage("");
             setImagePreview(null);
             if (fileInputRef.current) fileInputRef.current.value = "";
-
+            dispatch(setMessages(data));
             console.log("new message", data);
         } catch (error) {
             console.log("error", error);
             toast.error("Failed to send message");
         }
     };
+    // useEffect(() => {
+    //     const getmessages = async (id) => {
 
+    //         // setIsMessageLoading(true)
+    //         try {
+    //             const { data } = await axios(`/messages/${id}`)
+    //             dispatch(setMessages(data))
+
+    //         } catch (error) {
+    //             console.error(error)
+    //             //   setIsMessageLoading(false)
+    //         }
+    //     }
+    //     if (!selectedUser) return
+    //     getmessages(selectedUser._id)
+    // }, [selectedUser])
 
     return (
         <form onSubmit={sendMessage}>
@@ -115,7 +130,26 @@ const MessageInput = () => {
                     sx={{ ml: 1, flex: 1 }}
                     placeholder="Type a message..."
                     value={newMessage}
-                    onChange={(e) => setNewMessage(e.target.value)}
+                    onChange={(e) => {
+
+                        setNewMessage(e.target.value)
+
+                        if (!socketConnected) return
+                        if (!typing) {
+                            setTyping(true)
+                            socket.emit('typing', selectedUser._id)
+                        }
+                        let lastTypingTime = new Date().getTime();
+                        var timerLength = 3000;
+                        setTimeout(() => {
+                            var timeNow = new Date().getTime();
+                            var timeDiff = timeNow - lastTypingTime;
+                            if (timeDiff >= timerLength && typing) {
+                                socket.emit('stop typing', selectedUser._id);
+                                setTyping(false)
+                            }
+                        }, timerLength);
+                    }}
                 />
 
                 {/* Hidden File Input */}

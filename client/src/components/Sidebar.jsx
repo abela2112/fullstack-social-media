@@ -12,7 +12,7 @@ import { getSocket } from 'socketio';
 import { setOnlineUsers } from 'state';
 import WidgetWrapper from './widgetWrapper';
 import FlexBetween from './flexBetween';
-
+import { format, formatDistance, formatRelative, subDays } from 'date-fns'
 const SidebarContainer = styled(Box)(({ theme }) => ({
   width: 300,
   borderRight: `1px solid ${theme.palette.background.alt}`,
@@ -34,22 +34,28 @@ const OnlineIndicator = styled(Box)({
 const Sidebar = () => {
   const dispatch = useDispatch()
   const { palette } = useTheme()
+  const [users, setUsers] = useState([])
   const userId = useSelector(state => state.auth.user._id)
   const onlineUsers = useSelector((state) => state.auth.onlineUsers);
 
-  const { users, selectedUser } = useSelector(state => state.message)
+  const { selectedUser } = useSelector(state => state.message)
   const [isUserLoading, setIsUserLoading] = useState(false)
   const primaryLight = palette.primary.light;
   const neutralLight = palette.neutral.light;
   const main = palette.primary.main
   const alt = palette.background.alt
-  console.log("onlineUsers", onlineUsers)
+
   const getUsers = async () => {
     try {
       setIsUserLoading(true)
-      const data = await axios.get(`/messages/${userId}/friends`)
-
-      dispatch(setUsers(data.data))
+      const data = await axios.get(`/messages/${userId}/contacts`, {
+        headers: {
+          "Cache-Control": "no-store"
+        }
+      })
+      console.log("side bar users", data.data)
+      // dispatch(setUsers(data.data))
+      setUsers(data.data)
 
     } catch (error) {
       setIsUserLoading(false)
@@ -99,7 +105,7 @@ const Sidebar = () => {
                       backgroundColor: selectedUser?._id === contact._id ? main : neutralLight,
                       cursor: 'pointer'
                     },
-                    backgroundColor: selectedUser?._id === contact._id && main 
+                    backgroundColor: selectedUser?._id === contact._id && main
                   }
                 }
               >
@@ -110,10 +116,24 @@ const Sidebar = () => {
                   </Box>
                 </ListItemAvatar>
 
-                <ListItemText color={`primary`} primary={contact.firstName} secondary={contact.message} />
-                <Typography variant="body2" color="textSecondary">
-                  {contact.time}
-                </Typography>
+                <Box sx={{ width: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between", alignItems: "start" }}>
+                  {/* <ListItemText color={`primary`} primary={contact.firstName} secondary={contact.lastMessage} /> */}
+                  <FlexBetween sx={{ width: "100%", alignItems: 'flex-start' }}>
+
+                    <Typography variant="body1" fontWeight="bold" color="">{contact.firstName}</Typography>
+                    <Typography variant="h6" color="textSecondary">
+                      {contact.time && format(subDays(new Date(contact.time), 3), 'h:mm a')}
+                    </Typography>
+                  </FlexBetween>
+                  <Box sx={{ display: "flex", flexDirection: "column", justifyContent: "space-between", alignItems: "start", flex: 1 }}>
+                    <Typography variant="body2" color="textSecondary">{contact.lastMessage}</Typography>
+                  </Box>
+
+
+                  {/* <Typography variant="body1" color="textPrimary">{contact.firstName} {contact.lastName}</Typography> */}
+
+
+                </Box>
               </ListItemButton>
             })}
           </List>)
