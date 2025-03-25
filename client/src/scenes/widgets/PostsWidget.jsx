@@ -5,6 +5,7 @@ import { setPosts, setUserPosts } from 'state'
 import PostWidget from './PostWidget'
 import WidgetWrapper from 'components/widgetWrapper'
 import { Typography } from '@mui/material'
+import toast, { Toaster } from 'react-hot-toast'
 
 
 const PostsWidget = ({ userId, isProfile = false, searchQuery }) => {
@@ -13,16 +14,22 @@ const PostsWidget = ({ userId, isProfile = false, searchQuery }) => {
     const [filteredPosts, setFilteredPosts] = useState([])
     const [post, setPost] = useState(posts)
     const [isLoading, setIsoading] = useState(false)
-    console.log(isProfile)
+
     const getUserPosts = () => {
         axios.get(`post/user/${userId}`).then(({ data }) => {
             console.log(data)
             dispatch(setUserPosts({ posts: data }))
+        }).catch((err) => {
+            console.log(err)
+            toast.error('Failed to fetch user posts')
         })
 
     }
     const getPosts = () => {
-        axios.get(`post`).then(({ data }) => { dispatch(setPosts({ posts: data })) })
+        axios.get(`post`).then(({ data }) => { dispatch(setPosts({ posts: data })) }).catch((err) => {
+            console.log(err)
+            toast.error('Failed to fetch posts')
+        })
 
     }
     useEffect(() => {
@@ -79,7 +86,9 @@ const PostsWidget = ({ userId, isProfile = false, searchQuery }) => {
 
                 <WidgetWrapper>
                     <Typography variant='h6' color='textSecondary' align='center'>No posts</Typography>
-                </WidgetWrapper>}</>
+                </WidgetWrapper>}
+            <Toaster />
+        </>
     )
 }
 

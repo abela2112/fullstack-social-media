@@ -1,14 +1,15 @@
 import { useTheme } from '@emotion/react'
 import { Box, Button, Divider, IconButton, InputBase, Typography, useMediaQuery } from '@mui/material'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import axios from 'axios'
-import { setPosts } from 'state'
+import { addPosts, setPosts } from 'state'
 import WidgetWrapper from 'components/widgetWrapper'
 import FlexBetween from 'components/flexBetween'
 import UserImage from 'components/userImage'
 import Dropzone from 'react-dropzone'
 import { AttachFileOutlined, DeleteOutline, Edit, GifBox, ImageOutlined, MicOutlined, MoreHorizOutlined } from '@mui/icons-material'
+import toast, { Toaster } from 'react-hot-toast'
 const MyPostWidget = ({ picturePath }) => {
     const { _id } = useSelector((state) => state.auth.user)
     const { palette } = useTheme()
@@ -38,17 +39,28 @@ const MyPostWidget = ({ picturePath }) => {
 
             setIsLoading(true)
             const { data } = await axios.post('post/create', formData, { headers: { 'Content-Type': 'multipart/form-data' } })
-            console.log("data", data)
+
             dispatch(setPosts({ posts: data }))
             setPost('')
+            setIsImage(false)
             setImage(null)
             setIsLoading(false)
 
         } catch (error) {
             console.log(error)
+            toast.error(error?.response?.data?.error || "Something went wrong!")
             setIsLoading(false)
 
         }
+
+    }
+    const getPosts = () => {
+        axios.get(`post`).then(({ data }) => { dispatch(setPosts({ posts: data })) })
+            .catch((err) => {
+                console.log(err)
+                toast.error('Failed to fetch posts')
+            })
+
     }
     return (
         <WidgetWrapper>
@@ -158,6 +170,7 @@ const MyPostWidget = ({ picturePath }) => {
                     }}
                 >{isLoading ? "Loading" : "Post"}</Button>
             </FlexBetween>
+            <Toaster position='top-center' reverseOrder={false} />
         </WidgetWrapper>
     )
 }

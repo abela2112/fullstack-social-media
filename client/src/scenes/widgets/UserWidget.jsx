@@ -6,6 +6,7 @@ import FlexBetween from 'components/flexBetween'
 import UserImage from 'components/userImage'
 import WidgetWrapper from 'components/widgetWrapper'
 import React, { useEffect, useState } from 'react'
+import toast, { Toaster } from 'react-hot-toast'
 import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 
@@ -32,7 +33,10 @@ const UserWidget = ({ picture, userId }) => {
                 }).then(({ data }) => {
                     setuser(data);
                 });
-            } catch (error) { console.error(error); }
+            } catch (error) {
+                console.error(error);
+                toast.error(error?.response?.data?.error || "Something went wrong!");
+            }
         }
         getUser();
     }, [userId, token])
@@ -144,7 +148,7 @@ const UserWidget = ({ picture, userId }) => {
                 </FlexBetween>
             </Box>
 
-
+            <Toaster position='top-center' />
         </WidgetWrapper>
     )
 }

@@ -53,6 +53,9 @@ export const authSlice = createSlice({
     setPosts: (state, action) => {
       state.posts = action.payload.posts;
     },
+    addPosts: (state, action) => {
+      state.posts = [...state.posts, action.payload.post];
+    },
     setUserPosts: (state, action) => {
       state.userPosts = action.payload.posts;
     },
@@ -76,6 +79,7 @@ export const {
   setFriends,
   setLogin,
   updateUser,
+  addPosts,
   setLogout,
   setMode,
   setPosts,
