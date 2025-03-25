@@ -1,4 +1,6 @@
 # Social Media App
+[![Live Demo](https://img.shields.io/badge/Live-Demo-blue)](https://socal-media-754802.netlify.app/)
+
 
 ## 📌 Overview
 
