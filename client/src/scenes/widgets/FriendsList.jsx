@@ -6,6 +6,7 @@ import { Box, Typography } from '@mui/material'
 import { useTheme } from '@emotion/react'
 import Friend from '../../components/Friend'
 import axios from 'axios'
+import toast from 'react-hot-toast'
 const FriendsList = ({ userId }) => {
     const dispatch = useDispatch()
     const [isLoading, setIsLoading] = useState(false)
@@ -14,22 +15,32 @@ const FriendsList = ({ userId }) => {
     const dark = palette.neutral.dark
     const medium = palette.neutral.medium
     const getFriends = async () => {
-        setIsLoading(true)
+        try {
+            setIsLoading(true)
         const { data } = await axios.get(`users/${userId}/friends`)
         setIsLoading(false)
+
         dispatch(setFriends({ friends: data }))
+        } catch (error) {
+            setIsLoading(false)
+            toast.error(error?.response?.data?.error || "Something went wrong!");
+        }
     }
     useEffect(() => {
         getFriends()
-    }, []) // eslint-disable-line react-hooks/exhaustive-deps 
+    }, [])
+    // eslint-disable-line react-hooks/exhaustive-deps 
+    if (isLoading) return <WidgetWrapper>
+        <p>Loading ...</p>
+    </WidgetWrapper>
     return (
         <WidgetWrapper>
             <Typography variant='h5' color={dark} fontWeight={'500'}
                 sx={{ mb: '1.5rem' }}
             >Friend list</Typography>
             <Box mt={'1rem'} display={'flex'} flexDirection={'column'} gap={'2rem'}>
-                {isLoading && <p>Loading...</p>}
-                {friends.length > 0 ? friends.map((friend) => (
+                {/* {isLoading && <p>Loading...</p>} */}
+                {(friends && friends.length > 0) ? friends.map((friend) => (
                     <Friend
                         userId={userId}
                         friendId={friend?._id}

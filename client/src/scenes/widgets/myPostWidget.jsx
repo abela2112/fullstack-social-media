@@ -35,12 +35,10 @@ const MyPostWidget = ({ picturePath }) => {
                 // formData.append('picturePath', image.name)
             }
             // Debugging: Check the contents of FormData
-            for (const pair of formData.entries()) {
-                console.log(`${pair[0]}: ${pair[1]}`);
-            }
+
             setIsLoading(true)
             const { data } = await axios.post('post/create', formData, { headers: { 'Content-Type': 'multipart/form-data' } })
-            console.log("data")
+            console.log("data", data)
             dispatch(setPosts({ posts: data }))
             setPost('')
             setImage(null)

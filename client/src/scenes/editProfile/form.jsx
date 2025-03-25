@@ -9,6 +9,8 @@ import toast, { Toaster } from 'react-hot-toast';
 import Dropzone from "react-dropzone";
 import FlexBetween from "components/flexBetween";
 import { Edit } from "@mui/icons-material";
+import { updateUser } from "state";
+import { useDispatch } from "react-redux";
 const validationSchema = yup.object({
     firstName: yup.string().notRequired(),
     lastName: yup.string().notRequired(),
@@ -30,7 +32,7 @@ const validationSchema = yup.object({
   });
   
 const Form = ({user}) => {
-      
+    const dispatch = useDispatch()
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate()
     const { palette } = useTheme()
@@ -51,7 +53,8 @@ const Form = ({user}) => {
             })
             setIsLoading(false)
              const isUpdated = await updateProfileResponse.data
-            
+            console.log("update profile", isUpdated)
+            dispatch(updateUser(isUpdated))
             onSubmitProps.resetForm()
             if (isUpdated) {
                 toast.success("Profile updated successfully")

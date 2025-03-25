@@ -13,6 +13,7 @@ import { setOnlineUsers } from "state";
 const HomePage = () => {
     const { _id, picture } = useSelector((state) => state?.auth?.user);
     const userId = _id;
+    console.log("userId", userId);
     const [searchQuery, setSearchQuery] = useState("");
     const dispatch = useDispatch();
     useEffect(() => {
@@ -47,13 +48,12 @@ const HomePage = () => {
                 <Box flexBasis={isNonMobileScreen ? '42%' : undefined}
                     mt={isNonMobileScreen ? undefined : '2rem'}>
                     <MyPostWidget picturePath={picture} />
-                    <PostsWidget userId={_id} searchQuery={searchQuery} />
-
+                    <PostsWidget userId={userId} searchQuery={searchQuery} />
                 </Box>
                 {isNonMobileScreen && <Box flexBasis={'26%'}>
                     <AdvertiseWidget />
                     <Box m={'2rem 0'} />
-                    <FriendsList userId={_id} />
+                    <FriendsList userId={userId} />
 
                 </Box>}
 

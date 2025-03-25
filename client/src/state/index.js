@@ -22,7 +22,6 @@ export const authSlice = createSlice({
       state.user = action.payload.user;
       state.token = action.payload.token;
 
-
       // Connect the socket after user logs in
       if (!socketClient) {
         console.log("Connecting ..socket user id", state.user._id);
@@ -31,6 +30,9 @@ export const authSlice = createSlice({
         });
         socketClient.connect();
       }
+    },
+    updateUser: (state, action) => {
+      state.user = action.payload.user;
     },
     setLogout: (state) => {
       state.user = null;
@@ -43,7 +45,7 @@ export const authSlice = createSlice({
     },
     setFriends: (state, action) => {
       if (state.user) {
-        state.user.friends = action.payload.friends;
+        state.user.friends = action.payload.friends || [];
       } else {
         console.error("User friends not available");
       }
@@ -73,13 +75,13 @@ export const authSlice = createSlice({
 export const {
   setFriends,
   setLogin,
+  updateUser,
   setLogout,
   setMode,
   setPosts,
   updatePost,
   setOnlineUsers,
   setUserPosts,
-  updateUser,
 } = authSlice.actions;
 
 export default authSlice.reducer;

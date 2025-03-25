@@ -19,17 +19,15 @@ const Friend = ({ userId, friendId, name, subtitle, userPicturePath }) => {
     console.log("user -> _id", _id)
     console.log("userId", userId)
     const isFriend = friends?.find((friend) => friend._id === friendId);
-
     const primaryLight = palette.primary.light;
-
     const main = palette.primary.main
     const medium = palette.primary.medium
-
-
     const patchFriend = async () => {
         try {
             const { data } = await axios.patch(`users/${_id}/${friendId}`, {
+
             })
+
             dispatch(setFriends({ friends: data }))
         } catch (error) {
             console.log(error)
@@ -52,8 +50,8 @@ const Friend = ({ userId, friendId, name, subtitle, userPicturePath }) => {
                     <Typography fontSize={'0.75rem'} color={medium}>{subtitle}</Typography>
                 </Box>
             </FlexBetween>
-
-            {userId === _id && friendId !== _id && (
+            {(userId === _id) && (friendId !== _id) && (console.log("friendId", friendId))}
+            {(userId === _id) && (friendId !== _id) && (
                 <IconButton onClick={() => patchFriend()} sx={{ p: "0.6rem", backgroundColor: primaryLight }}>
                     {isFriend ? <PersonRemoveOutlined /> : <PersonAddOutlined />}</IconButton>)}
         </FlexBetween>

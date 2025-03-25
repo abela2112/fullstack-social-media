@@ -15,7 +15,7 @@ const userSchema = new Schema(
     },
     password: { type: String, required: true, min: 8, max: 50 },
     picture: { type: String, default: "" },
-    friends: { type: Array, default: [] },
+    friends: [{ type: Schema.Types.ObjectId, ref: "user", default: [] }],
     location: String,
     occupation: String,
     viewedProfile: Number,

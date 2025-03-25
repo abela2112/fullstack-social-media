@@ -1,13 +1,14 @@
 import Post from "../model/posts.js";
 import User from "../model/user.js";
  import cloudinary from "../lib/cloudinary.js";
- import { upload } from "../lib/multer.js";
+
  export const createPost = async (req, res) => {
    try {
      const { userId, description, picture } = req.body;
      const user = await User.findById(userId);
      if (!user) throw new Error("No such user");
      console.log(req.file);
+     //  console.log("req", req);
      let cloudinaryResponse;
 
      if (req.file) {
@@ -31,6 +32,7 @@ import User from "../model/user.js";
      const post = await Post.find().sort({ createdAt: -1 });
      res.status(200).json(post);
    } catch (error) {
+     console.log("Create Post error ->", error);
      res.status(404).json({ error: error.message });
    }
  };

@@ -89,20 +89,28 @@ export const addRemoveFriends = async (req, res) => {
     const isFriend = user.friends.includes(friendId);
 
     // Update both users
-    await User.findByIdAndUpdate(id, {
-      [isFriend ? "$pull" : "$addToSet"]: { friends: friendId },
-    });
+    await User.findByIdAndUpdate(
+      id,
+      {
+        [isFriend ? "$pull" : "$addToSet"]: { friends: friendId },
+      },
+      { new: true }
+    );
 
-    await User.findByIdAndUpdate(friendId, {
-      [isFriend ? "$pull" : "$addToSet"]: { friends: id },
-    });
+    await User.findByIdAndUpdate(
+      friendId,
+      {
+        [isFriend ? "$pull" : "$addToSet"]: { friends: id },
+      },
+      { new: true }
+    );
 
     // Fetch updated friend list
     const updatedUser = await User.findById(id).populate(
       "friends",
       "_id firstName lastName occupation location picture"
     );
-
+    console.log("friends", updatedUser.friends);
     res.status(200).json(updatedUser.friends);
   } catch (error) {
     console.error("Edit error:", error);

@@ -33,7 +33,7 @@ const PostWidget = ({
   const primary = palette.primary.main
   const main = palette.neutral.main
 
-
+  console.log("userId", userLoggedId);
   const patchLikes = async () => {
 
     const { data } = await axios.patch(`post/${postId}/like`, { userId: userLoggedId })
@@ -45,7 +45,9 @@ const PostWidget = ({
   }
   return (
     <WidgetWrapper>
-      <Friend friendId={PostuserId}
+      <Friend
+        userId={userLoggedId}
+        friendId={PostuserId}
         name={name}
         subtitle={location}
         userPicturePath={userPicturePath} />
