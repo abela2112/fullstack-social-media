@@ -3,11 +3,15 @@ import { useDispatch, useSelector } from 'react-redux'
 import axios from 'axios'
 import { setPosts, setUserPosts } from 'state'
 import PostWidget from './PostWidget'
+import WidgetWrapper from 'components/widgetWrapper'
+import { Typography } from '@mui/material'
 
 
-const PostsWidget = ({ userId, isProfile = false }) => {
+const PostsWidget = ({ userId, isProfile = false, searchQuery }) => {
     const posts = useSelector((state) => isProfile ? state.auth.userPosts : state.auth.posts) 
     const dispatch = useDispatch()
+    const [filteredPosts, setFilteredPosts] = useState([])
+    const [post, setPost] = useState(posts)
     const [isLoading, setIsoading] = useState(false)
     console.log(isProfile)
     const getUserPosts = () => {
@@ -27,12 +31,27 @@ const PostsWidget = ({ userId, isProfile = false }) => {
         setIsoading(false)
 
     }, [isProfile])
+
+    useEffect(() => {
+        if (searchQuery === '') {
+            setPost(posts)
+        }
+        if (!searchQuery) return
+        setFilteredPosts(posts?.filter(post =>
+            post.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            post.lastName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            post.description.toLowerCase().includes(searchQuery.toLowerCase())))
+
+        setPost(filteredPosts)
+
+
+    }, [searchQuery])
     return (
 
         <>
             {isLoading && <p>Loading...</p>}
 
-            {posts?.length > 0 ? posts.map(({
+            {post?.length > 0 ? post.map(({
             _id,
             firstName,
             lastName,
@@ -56,7 +75,11 @@ const PostsWidget = ({ userId, isProfile = false }) => {
                 userPicturePath={userPicturePath}
                 description={description} />
 
-            )) : <p>No posts</p>}</>
+            )) :
+
+                <WidgetWrapper>
+                    <Typography variant='h6' color='textSecondary' align='center'>No posts</Typography>
+                </WidgetWrapper>}</>
     )
 }
 

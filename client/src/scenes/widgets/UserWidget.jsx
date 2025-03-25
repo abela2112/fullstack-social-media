@@ -16,6 +16,8 @@ const UserWidget = ({ picture, userId }) => {
     const { palette } = useTheme()
     const [user, setuser] = useState(null)
     const token = useSelector((state) => state.auth.token);
+    const LoggedInUser = useSelector(state => state.auth.user._id)
+
     const dark = palette.neutral.dark;
     const medium = palette.neutral.medium;
     const main = palette.neutral.main;
@@ -72,7 +74,7 @@ const UserWidget = ({ picture, userId }) => {
                 </IconButton> 
             </FlexBetween>
             <Divider />
-            <Box padding={'1rem 0'}>
+            {(occupation || location) && <Box padding={'1rem 0'}>
                 {location &&
                     (<Box display={'flex'} alignItems={'center'} gap={'0.5rem'} >
                     <LocationCityOutlined sx={{ color: medium }} fontSize='large' />
@@ -86,9 +88,9 @@ const UserWidget = ({ picture, userId }) => {
                     <Typography color={medium}>{occupation}</Typography>
                 </Box>
                     )}
-            </Box>
+            </Box>}
             <Divider />
-            <Box p={'1rem 0'}>
+            {LoggedInUser === userId && <Box p={'1rem 0'}>
                 <FlexBetween mb={'0.5rem'}>
                     <Typography color={medium}>who's viewed your profile</Typography>
                     <Typography color={main} fontWeight={'500'}>{viewedProfile}</Typography>
@@ -97,7 +99,7 @@ const UserWidget = ({ picture, userId }) => {
                     <Typography color={medium}>Impresions on your post</Typography>
                     <Typography color={main} fontWeight={'500'}>{impressions}</Typography>
                 </FlexBetween>
-            </Box>
+            </Box>}
             <Divider />
             <Box p={'1rem 0'}>
                 <Typography color={medium} fontSize={'1rem'}>social profile</Typography>
@@ -115,10 +117,10 @@ const UserWidget = ({ picture, userId }) => {
 
                         {/* {twitterLink && <Typography color={main} >{twitterLink}</Typography>} */}
                     </FlexBetween>
-                    <IconButton aria-label="" onClick={() => navigate(`/profile/${userId}/edit`)}>
+                    {LoggedInUser === userId && <IconButton aria-label="" onClick={() => navigate(`/profile/${userId}/edit`)}>
                         <EditOutlined sx={{ color: { main } }} />
                     </IconButton>
-
+                    }
                 </FlexBetween>
                 <FlexBetween gap={'0.5rem'}>
                     <FlexBetween gap={'0.5rem'}>
@@ -135,10 +137,10 @@ const UserWidget = ({ picture, userId }) => {
                         </FlexBetween>
                         {/* {linkedinLink && <Typography color={main} >{linkedinLink}</Typography>} */}
                     </FlexBetween>
-                    <IconButton aria-label="" onClick={() => navigate(`/profile/${userId}/edit`)}>
+                    {LoggedInUser === userId && <IconButton aria-label="" onClick={() => navigate(`/profile/${userId}/edit`)}>
                         <EditOutlined sx={{ color: { main } }} />
 
-                    </IconButton>
+                    </IconButton>}
                 </FlexBetween>
             </Box>
 

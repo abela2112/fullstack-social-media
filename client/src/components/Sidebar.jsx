@@ -1,8 +1,8 @@
 // Desc: Sidebar component for displaying users and their messages
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
-import { Search, Menu } from '@mui/icons-material';
-import { Avatar, Box, Divider, IconButton, InputBase, List, ListItem, ListItemAvatar, ListItemButton, ListItemText, Skeleton, Typography } from '@mui/material';
+import { Search, Menu, ArrowLeft, ArrowBack } from '@mui/icons-material';
+import { Avatar, Box, Divider, IconButton, InputBase, List, ListItem, ListItemAvatar, ListItemButton, ListItemText, Skeleton, Tooltip, Typography } from '@mui/material';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
@@ -13,6 +13,7 @@ import { setOnlineUsers } from 'state';
 import WidgetWrapper from './widgetWrapper';
 import FlexBetween from './flexBetween';
 import { format, formatDistance, formatRelative, subDays } from 'date-fns'
+import { useNavigate } from 'react-router-dom';
 const SidebarContainer = styled(Box)(({ theme }) => ({
   width: 300,
   borderRight: `1px solid ${theme.palette.background.alt}`,
@@ -37,7 +38,7 @@ const Sidebar = () => {
   const [users, setUsers] = useState([])
   const userId = useSelector(state => state.auth.user._id)
   const onlineUsers = useSelector((state) => state.auth.onlineUsers);
-
+  const navigate = useNavigate()
   const { selectedUser } = useSelector(state => state.message)
   const [isUserLoading, setIsUserLoading] = useState(false)
   const primaryLight = palette.primary.light;
@@ -76,9 +77,11 @@ const Sidebar = () => {
 
     <SidebarContainer>
       <Box p={2} display="flex" alignItems="center" justifyContent="space-between">
-        <IconButton>
-          <Menu />
-        </IconButton>
+        <Tooltip title="Back Home">
+          <IconButton onClick={() => navigate('/home')}>
+            <ArrowBack />
+          </IconButton>
+        </Tooltip>
         <FlexBetween bgcolor={neutralLight}
           padding={'0.1rem 1.5rem'}
           borderRadius={'9px'}
@@ -94,7 +97,7 @@ const Sidebar = () => {
           <MessageuserSKeleton />
           :
           (<List>
-            {users?.length > 0 && users?.map((contact, index) => {
+            {users?.length > 0 ? users?.map((contact, index) => {
               const isOnline = onlineUsers?.some(user => user === contact._id); // Check if user is online
 
               return <ListItemButton key={index}
@@ -120,7 +123,7 @@ const Sidebar = () => {
                   {/* <ListItemText color={`primary`} primary={contact.firstName} secondary={contact.lastMessage} /> */}
                   <FlexBetween sx={{ width: "100%", alignItems: 'flex-start' }}>
 
-                    <Typography variant="body1" fontWeight="bold" color="">{contact.firstName}</Typography>
+                    <Typography variant="body1" color="textPrimary" fontSize={'1rem'}>{contact.firstName}</Typography>
                     <Typography variant="h6" color="textSecondary">
                       {contact.time && format(subDays(new Date(contact.time), 3), 'h:mm a')}
                     </Typography>
@@ -135,7 +138,14 @@ const Sidebar = () => {
 
                 </Box>
               </ListItemButton>
-            })}
+            }) :
+              <List>
+                <ListItem>
+                  <ListItemText primary="No Friends found
+" />
+                </ListItem>
+              </List>
+            }
           </List>)
       }
 

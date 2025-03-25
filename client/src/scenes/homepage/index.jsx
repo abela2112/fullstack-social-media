@@ -1,5 +1,5 @@
 import { Box, useMediaQuery } from "@mui/material";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux"
 import Navbar from "scenes/Navbar"
 import FriendsList from "scenes/widgets/FriendsList";
@@ -13,6 +13,7 @@ import { setOnlineUsers } from "state";
 const HomePage = () => {
     const { _id, picture } = useSelector((state) => state?.auth?.user);
     const userId = _id;
+    const [searchQuery, setSearchQuery] = useState("");
     const dispatch = useDispatch();
     useEffect(() => {
         if (!userId) return;
@@ -31,7 +32,7 @@ const HomePage = () => {
     const isNonMobileScreen = useMediaQuery('(min-width:1000px)');
     return (
         <Box>
-            <Navbar />
+            <Navbar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
             <Box width={'100%'}
                 padding={'2rem 6%'}
                 gap={'1rem'}
@@ -46,7 +47,7 @@ const HomePage = () => {
                 <Box flexBasis={isNonMobileScreen ? '42%' : undefined}
                     mt={isNonMobileScreen ? undefined : '2rem'}>
                     <MyPostWidget picturePath={picture} />
-                    <PostsWidget userId={_id} />
+                    <PostsWidget userId={_id} searchQuery={searchQuery} />
 
                 </Box>
                 {isNonMobileScreen && <Box flexBasis={'26%'}>

@@ -11,12 +11,12 @@ import MenuIcon from '@mui/icons-material/Menu';
 
 import { socket } from "socketio"
 
-const Navbar = () => {
+const Navbar = ({ searchQuery, setSearchQuery }) => {
     const [isMobileToggle, setIsMobileToggle] = useState(false)
     const Navigate = useNavigate()
     const dispatch = useDispatch()
     const user = useSelector((state) => state.auth.user)
-    const socketClient = useSelector((state) => state.auth.socketClient)
+
     const nonMobileScreens = useMediaQuery('(min-width: 1000px)')
     const theme = useTheme()
     const neutralLight = theme.palette.neutral.light;
@@ -44,7 +44,10 @@ const Navbar = () => {
                     padding={'0.1rem 1.5rem'}
                     borderRadius={'9px'}
                     gap={'3rem'}>
-                    <InputBase placeholder="search ..." />
+                    <InputBase placeholder="search ..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                    />
                     <IconButton><Search /></IconButton>
                 </FlexBetween>)}
             </FlexBetween>

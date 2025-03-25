@@ -8,25 +8,25 @@ import ChatContainer from 'components/ChatContainer'
 import NoChat from 'components/NoChat'
 import Sidebar from 'components/Sidebar'
 import Navbar from 'scenes/Navbar'
-  const RootContainer = styled(Box)({
-    display: "flex",
-    height: "100vh",
-    backgroundColor: "#ebedf0",
-  });
-  
+const RootContainer = styled(Box)({
+  display: "flex",
+  height: "100vh",
+  backgroundColor: "#ebedf0",
+});
+
 const ChatPage = () => {
-    const { selectedUser } = useSelector(state => state.message)
-    return (
-        <>
-    <RootContainer>
+  const { selectedUser } = useSelector(state => state.message)
+  return (
+    <>
+      <RootContainer>
 
 
-      {/* Sidebar */}
-      <Sidebar/>
-      {selectedUser ? <ChatContainer user={selectedUser}/>:<NoChat/>}
+        {/* Sidebar */}
+        <Sidebar />
+        {selectedUser ? <ChatContainer user={selectedUser} /> : <NoChat />}
       </RootContainer>
-      </>
-    )
+    </>
+  )
 }
 
 export default ChatPage
